@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 
-
 # ==========================================
 # Page Configuration
 # ==========================================
@@ -11,7 +10,6 @@ st.set_page_config(
     page_icon="🛡️",
     layout="centered"
 )
-
 
 # ==========================================
 # Title
@@ -25,7 +23,6 @@ st.write(
     "Machine Learning and Rule-Based Detection."
 )
 
-
 # ==========================================
 # SQL Query Input
 # ==========================================
@@ -35,7 +32,6 @@ query = st.text_area(
     placeholder="Example: SELECT * FROM users WHERE username='admin'",
     height=150
 )
-
 
 # ==========================================
 # Analyze Button
@@ -52,11 +48,10 @@ if st.button("🔍 Analyze Query"):
         try:
 
             response = requests.post(
-                "http://127.0.0.1:8000/predict",
+                "https://sqlguard-api.onrender.com/predict",
                 json={"query": query},
                 timeout=10
             )
-
 
             # ==================================
             # Successful Response
@@ -73,11 +68,9 @@ if st.button("🔍 Analyze Query"):
                 severity = result["severity"]
                 indicators = result["indicators"]
 
-
                 st.divider()
 
                 st.subheader("Analysis Result")
-
 
                 # ==================================
                 # Verdict
@@ -95,7 +88,6 @@ if st.button("🔍 Analyze Query"):
 
                     st.success("✅ SAFE")
 
-
                 # ==================================
                 # Risk Score
                 # ==================================
@@ -104,7 +96,6 @@ if st.button("🔍 Analyze Query"):
                     label="Risk Score",
                     value=f"{risk_score}%"
                 )
-
 
                 # ==================================
                 # Detection Details
@@ -126,7 +117,6 @@ if st.button("🔍 Analyze Query"):
                         rule_score
                     )
 
-
                 st.write("### Severity")
 
                 if severity == "critical":
@@ -144,7 +134,6 @@ if st.button("🔍 Analyze Query"):
                 else:
 
                     st.info("🟢 None")
-
 
                 # ==================================
                 # Detected Indicators
@@ -171,7 +160,6 @@ if st.button("🔍 Analyze Query"):
                         "No suspicious SQL injection indicators detected."
                     )
 
-
                 # ==================================
                 # Full API Response
                 # ==================================
@@ -179,7 +167,6 @@ if st.button("🔍 Analyze Query"):
                 with st.expander("View Technical Details"):
 
                     st.json(result)
-
 
             else:
 
@@ -189,7 +176,6 @@ if st.button("🔍 Analyze Query"):
 
                 st.code(response.text)
 
-
         except requests.exceptions.ConnectionError:
 
             st.error(
@@ -197,9 +183,8 @@ if st.button("🔍 Analyze Query"):
             )
 
             st.info(
-                "Make sure FastAPI is running on http://127.0.0.1:8000"
+                "Make sure the SQLGuard API is running on Render."
             )
-
 
         except requests.exceptions.Timeout:
 

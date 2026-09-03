@@ -1,61 +1,184 @@
 import streamlit as st
 import requests
 
+
 # ==========================================
 # Page Configuration
 # ==========================================
 
 st.set_page_config(
-    page_title="SQLGuard",
+    page_title="SQLGuard | SQL Injection Detection",
     page_icon="🛡️",
-    layout="centered"
+    layout="wide"
 )
 
+
 # ==========================================
-# Title
+# Custom CSS
 # ==========================================
 
-st.title("🛡️ SQLGuard")
-st.subheader("SQL Injection Detection System")
+st.markdown(
+    """
+    <style>
 
-st.write(
-    "Enter an SQL query below to analyze it using "
-    "Machine Learning and Rule-Based Detection."
+    .main-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0;
+    }
+
+    .subtitle {
+        font-size: 1.15rem;
+        opacity: 0.75;
+        margin-bottom: 2rem;
+    }
+
+    .result-box {
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .safe {
+        border: 2px solid #21c55d;
+    }
+
+    .suspicious {
+        border: 2px solid #f59e0b;
+    }
+
+    .malicious {
+        border: 2px solid #ef4444;
+    }
+
+    .result-title {
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-top: 20px;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
 )
 
+
 # ==========================================
-# SQL Query Input
+# Header
 # ==========================================
+
+st.markdown(
+    '<div class="main-title">🛡️ SQLGuard</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<div class="subtitle">'
+    'Hybrid SQL Injection Detection System using Machine Learning and Rule-Based Analysis'
+    '</div>',
+    unsafe_allow_html=True
+)
+
+
+# ==========================================
+# Information
+# ==========================================
+
+with st.expander("ℹ️ About SQLGuard"):
+
+    st.write(
+        """
+        SQLGuard is a cybersecurity detection system designed to identify
+        potentially malicious SQL queries.
+
+        It combines two detection approaches:
+
+        • Machine Learning using TF-IDF and Random Forest  
+        • Rule-Based Detection for known SQL injection patterns
+
+        The final verdict is based on a hybrid risk engine.
+        """
+    )
+
+
+# ==========================================
+# Query Input
+# ==========================================
+
+st.markdown(
+    '<div class="section-title">🔍 Analyze SQL Query</div>',
+    unsafe_allow_html=True
+)
 
 query = st.text_area(
-    "Enter SQL Query",
+    "Enter your SQL query",
     placeholder="Example: SELECT * FROM users WHERE username='admin'",
-    height=150
+    height=180,
+    label_visibility="collapsed"
 )
 
+
 # ==========================================
-# Analyze Button
+# Example Queries
 # ==========================================
 
-if st.button("🔍 Analyze Query"):
+st.caption("Try an example:")
+
+example_col1, example_col2, example_col3 = st.columns(3)
+
+with example_col1:
+
+    if st.button("✅ Safe Example", use_container_width=True):
+
+        query = "SELECT * FROM users WHERE username='admin'"
+
+
+with example_col2:
+
+    if st.button("⚠️ Suspicious Example", use_container_width=True):
+
+        query = "SELECT * FROM users WHERE username='admin' OR id=5"
+
+
+with example_col3:
+
+    if st.button("🚨 Malicious Example", use_container_width=True):
+
+        query = "' OR 1=1 --"
+
+
+# ==========================================
+# Analyze
+# ==========================================
+
+if st.button(
+    "🔎 Analyze Query",
+    type="primary",
+    use_container_width=True
+):
 
     if not query.strip():
 
-        st.warning("Please enter an SQL query.")
+        st.warning("Please enter an SQL query first.")
 
     else:
 
         try:
 
-            response = requests.post(
-                "https://sqlguard-api.onrender.com/predict",
-                json={"query": query},
-                timeout=10
-            )
+            with st.spinner("Analyzing query..."):
 
-            # ==================================
-            # Successful Response
-            # ==================================
+                response = requests.post(
+                    "https://sqlguard-api.onrender.com/predict",
+                    json={"query": query},
+                    timeout=30
+                )
+
 
             if response.status_code == 200:
 
@@ -68,9 +191,8 @@ if st.button("🔍 Analyze Query"):
                 severity = result["severity"]
                 indicators = result["indicators"]
 
-                st.divider()
 
-                st.subheader("Analysis Result")
+                st.divider()
 
                 # ==================================
                 # Verdict
@@ -78,68 +200,115 @@ if st.button("🔍 Analyze Query"):
 
                 if verdict == "Malicious":
 
-                    st.error("🚨 MALICIOUS")
+                    st.markdown(
+                        """
+                        <div class="result-box malicious">
+                            <div class="result-title">
+                                🚨 MALICIOUS
+                            </div>
+                            <div>
+                                Potential SQL Injection Detected
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
                 elif verdict == "Suspicious":
 
-                    st.warning("⚠️ SUSPICIOUS")
+                    st.markdown(
+                        """
+                        <div class="result-box suspicious">
+                            <div class="result-title">
+                                ⚠️ SUSPICIOUS
+                            </div>
+                            <div>
+                                Query Requires Further Investigation
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
                 else:
 
-                    st.success("✅ SAFE")
+                    st.markdown(
+                        """
+                        <div class="result-box safe">
+                            <div class="result-title">
+                                ✅ SAFE
+                            </div>
+                            <div>
+                                No Significant SQL Injection Risk Detected
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
 
                 # ==================================
-                # Risk Score
+                # Metrics
                 # ==================================
 
-                st.metric(
-                    label="Risk Score",
-                    value=f"{risk_score}%"
-                )
-
-                # ==================================
-                # Detection Details
-                # ==================================
-
-                col1, col2 = st.columns(2)
+                col1, col2, col3 = st.columns(3)
 
                 with col1:
+
+                    st.metric(
+                        "Risk Score",
+                        f"{risk_score}%"
+                    )
+
+                with col2:
 
                     st.metric(
                         "ML Probability",
                         f"{ml_probability}%"
                     )
 
-                with col2:
+                with col3:
 
                     st.metric(
                         "Rule Score",
                         rule_score
                     )
 
-                st.write("### Severity")
+
+                # ==================================
+                # Severity
+                # ==================================
+
+                st.markdown(
+                    '<div class="section-title">⚡ Severity</div>',
+                    unsafe_allow_html=True
+                )
 
                 if severity == "critical":
 
-                    st.error("🔴 Critical")
+                    st.error("🔴 CRITICAL")
 
                 elif severity == "high":
 
-                    st.warning("🟠 High")
+                    st.warning("🟠 HIGH")
 
                 elif severity == "medium":
 
-                    st.warning("🟡 Medium")
+                    st.warning("🟡 MEDIUM")
 
                 else:
 
-                    st.info("🟢 None")
+                    st.success("🟢 NONE")
+
 
                 # ==================================
-                # Detected Indicators
+                # Indicators
                 # ==================================
 
-                st.write("### Detected Indicators")
+                st.markdown(
+                    '<div class="section-title">🧩 Detected Indicators</div>',
+                    unsafe_allow_html=True
+                )
 
                 if indicators:
 
@@ -160,13 +329,15 @@ if st.button("🔍 Analyze Query"):
                         "No suspicious SQL injection indicators detected."
                     )
 
+
                 # ==================================
-                # Full API Response
+                # Technical Details
                 # ==================================
 
-                with st.expander("View Technical Details"):
+                with st.expander("🧪 View Technical Details"):
 
                     st.json(result)
+
 
             else:
 
@@ -176,18 +347,27 @@ if st.button("🔍 Analyze Query"):
 
                 st.code(response.text)
 
+
         except requests.exceptions.ConnectionError:
 
             st.error(
                 "❌ Could not connect to SQLGuard API."
             )
 
-            st.info(
-                "Make sure the SQLGuard API is running on Render."
-            )
 
         except requests.exceptions.Timeout:
 
             st.error(
-                "❌ The API request timed out."
+                "⏱️ The API request timed out."
             )
+
+
+# ==========================================
+# Footer
+# ==========================================
+
+st.divider()
+
+st.caption(
+    "🛡️ SQLGuard — Hybrid Machine Learning + Rule-Based SQL Injection Detection"
+)

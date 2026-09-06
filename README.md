@@ -25,6 +25,10 @@ The system combines:
 
 ## 🏗️ System Architecture
 
+## System Architecture
+
+![SQLGuard Architecture](architecture.png)
+
 ```text
 User
   │

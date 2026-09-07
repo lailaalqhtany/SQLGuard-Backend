@@ -2,6 +2,57 @@
 
 ## AI-Powered SQL Injection Detection System
 
+## Project Overview
+
+SQLGuard is an AI-powered SQL Injection Detection System designed to detect and classify potentially malicious SQL queries.
+
+The system combines two detection approaches:
+
+- Machine Learning using TF-IDF and Random Forest.
+- Rule-Based Detection using Regex and security rules.
+
+The two approaches work together to calculate a final risk score and classify the query as Safe, Suspicious, or Malicious.
+
+SQLGuard provides an interactive Streamlit interface and a FastAPI backend for real-time query analysis.
+
+## How It Works
+
+1. The user enters an SQL query through the Streamlit interface.
+2. Streamlit sends the query to the FastAPI backend.
+3. The backend analyzes the query using the Machine Learning and Rule-Based engines.
+4. The ML engine calculates the probability of SQL Injection.
+5. The Rule Engine checks for known SQL Injection patterns.
+6. The results are combined to calculate the final risk score.
+7. SQLGuard returns the verdict, severity, risk score, and detected indicators.
+
+8. ## Results & Performance
+
+SQLGuard was evaluated using a dataset of SQL queries and achieved strong classification performance.
+
+| Metric | Result |
+|---|---:|
+| Accuracy | 99.53% |
+| Precision | 99.82% |
+| Recall | 98.95% |
+| F1-Score | 99.38% |
+
+The Machine Learning model uses TF-IDF for text feature extraction and a Random Forest classifier for SQL Injection detection.
+
+In addition to Machine Learning, SQLGuard uses a Rule-Based Detection Engine to identify known SQL Injection patterns and provide additional security indicators.
+
+## Technologies Used
+
+- Python
+- FastAPI
+- Streamlit
+- Scikit-learn
+- TF-IDF
+- Random Forest
+- Regular Expressions (Regex)
+- Git & GitHub
+- Render
+- Streamlit Cloud
+
 SQLGuard is a cybersecurity system designed to detect SQL Injection attacks using a hybrid approach that combines **Machine Learning** with **Rule-Based Detection**.
 
 The system analyzes SQL queries and provides a security verdict along with a risk score, severity level, machine-learning probability, rule score, and detected attack indicators.

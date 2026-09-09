@@ -78,7 +78,7 @@ The system combines:
 
 ## System Architecture
 
-![SQLGuard Architecture](architecture.png)
+![SQLGuard Architecture](Architecture.png)
 
 ```text
 User
